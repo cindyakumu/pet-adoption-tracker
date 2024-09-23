@@ -6,8 +6,8 @@ from datetime import date
 def create_connection():
     return psycopg2.connect(
         dbname='my_pet', 
-        user='cindy',
-        password='CODEWITHME', 
+        user='nashon',
+        password='23456', 
         host='localhost'
     )
 
@@ -28,7 +28,7 @@ def main_menu():
     options = [
         "Add Pet for Approval", "Approve Pet", "Reject Pet", 
         "Submit Adoption Request", "Approve Adoption", 
-        "Reject Adoption", "View Pending Approvals", "Exit"
+        "Reject Adoption", "View Pending Approvals", "Update Pet Details", "Exit"
     ]
     for i, option in enumerate(options, 1):
         print(f"{i}. {option}")
@@ -91,6 +91,34 @@ def view_pending_approvals():
     else:
         print("No pets pending approval.")
 
+# Update pet details
+def update_pet():
+    pet_id = get_input("Enter the pet ID to update: ", lambda x: int(x) if x.isdigit() else None)
+    
+    fields = {
+        '1': 'name',
+        '2': 'species',
+        '3': 'breed',
+        '4': 'adoption_status'
+    }
+    
+    print("Select the field to update:")
+    for key, field in fields.items():
+        print(f"{key}. {field}")
+        
+    field_choice = get_input("Choose a field to update: ")
+    field = fields.get(field_choice)
+    
+    if not field:
+        print("Invalid choice.")
+        return
+    
+    new_value = get_input(f"Enter the new {field}: ")
+    query = f"UPDATE pets SET {field} = %s WHERE id = %s"
+    
+    execute_query(query, (new_value, pet_id))
+    print(f"Pet with ID {pet_id} updated successfully.")
+
 # Main function
 def main():
     actions = {
@@ -101,7 +129,8 @@ def main():
         '5': approve_adoption,
         '6': reject_adoption,
         '7': view_pending_approvals,
-        '8': sys.exit
+        '8': update_pet,  # Added the update_pet function to the menu
+        '9': sys.exit
     }
     
     while True:
